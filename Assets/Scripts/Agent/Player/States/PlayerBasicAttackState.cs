@@ -1,12 +1,12 @@
 using UnityEngine;
 
-public class BasicAttackState : StateBase
+public class PlayerBasicAttackState : PlayerStateBase
 {
     private int _currentAttackIndex = 0;
     private const int MAX_INDEX = 3;
     private float _lastAttackTime;
     private float _comboChainTime = 1f;
-    public BasicAttackState(PlayerController playerController) : base(playerController)
+    public PlayerBasicAttackState(PlayerController playerController) : base(playerController)
     {
     }
     public override void Enter()

@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class IdleState : StateBase
+public class PlayerIdleState : PlayerStateBase
 {
-    public IdleState(PlayerController player) : base(player)
+    public PlayerIdleState(PlayerController player) : base(player)
     {
     }
 

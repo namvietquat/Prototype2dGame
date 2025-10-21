@@ -1,11 +1,11 @@
 public class StateMachine
 {
-    private StateBase _currentState; // field - trường
-    public StateBase CurrentState // property - thuộc tính
+    private AgentStateBase _currentState; // field - trường
+    public AgentStateBase CurrentState // property - thuộc tính
     {
         get => _currentState;
     }
-    public void ChangeState(StateBase newState)
+    public void ChangeState(AgentStateBase newState)
     {
         // null check
         if (newState == null)

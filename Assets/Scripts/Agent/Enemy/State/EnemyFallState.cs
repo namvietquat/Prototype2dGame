@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class FallState : StateBase
+public class EnemyFallState : EnemyStateBase
 {
-    public FallState(PlayerController player) : base(player)
+    public EnemyFallState(EnemyController enemy) : base(enemy)
     {
     }
     public override void Enter()
@@ -18,13 +18,13 @@ public class FallState : StateBase
     public override void Update()
     {
         base.Update();
-        if (_player.IsGroundDetect)
+        if (_enemy.IsGroundDetect)
         {
-            _stateMachine.ChangeState(_player.IdleState);
+            _stateMachine.ChangeState(_enemy.IdleState);
         }
-        if (_player.IsWallDetected)
+        if (_enemy.IsWallDetected)
         {
-            _stateMachine.ChangeState(_player.WallSlideState);
+            _stateMachine.ChangeState(_enemy.WallSlideState);
         }
     }
 }

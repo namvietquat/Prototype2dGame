@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-public class PlayerController : MonoBehaviour
+public class EnemyController : AgentController
 {
     private StateMachine _stateMachine;
     private Rigidbody2D _rb;
@@ -48,12 +48,9 @@ public class PlayerController : MonoBehaviour
     #endregion
 
     #region States    
-    public StateBase IdleState;
-    public StateBase RunState;
-    public StateBase JumpState;
-    public StateBase FallState;
-    public StateBase WallSlideState;
-    public StateBase BasicAttackState;
+    public EnemyStateBase EnemyIdleState;
+    public EnemyStateBase EnemyRunState;
+    public EnemyStateBase EnemyBasicAttackState;
     #endregion
 
     void Awake()
@@ -62,13 +59,11 @@ public class PlayerController : MonoBehaviour
         _animator = GetComponent<Animator>();
         _stateMachine = new StateMachine();
 
-        IdleState = new IdleState(this);
-        RunState = new RunState(this);
-        JumpState = new JumpState(this);
-        FallState = new FallState(this);
-        WallSlideState = new WallSlideState(this);
-        BasicAttackState = new BasicAttackState(this);
-        _stateMachine.ChangeState(IdleState);
+        EnemyIdleState = new EnemyIdleState(this);
+        EnemyRunState = new EnemyRunState(this);
+     
+        EnemyBasicAttackState = new EnemyBasicAttackState(this);
+        _stateMachine.ChangeState(EnemyIdleState);
     }
     void Update()
     {

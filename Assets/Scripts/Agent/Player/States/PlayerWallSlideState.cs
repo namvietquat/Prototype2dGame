@@ -1,9 +1,9 @@
 using UnityEngine;
 
-public class WallSlideState : StateBase
+public class PlayerWallSlideState : PlayerStateBase
 {
 
-    public WallSlideState(PlayerController player) : base(player)
+    public PlayerWallSlideState(PlayerController player) : base(player)
     {
     }
     public override void Enter()

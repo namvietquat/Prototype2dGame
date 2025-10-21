@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class JumpState : StateBase
+public class PlayerFallState : PlayerStateBase
 {
-    public JumpState(PlayerController player) : base(player)
+    public PlayerFallState(PlayerController player) : base(player)
     {
     }
     public override void Enter()
@@ -18,10 +18,6 @@ public class JumpState : StateBase
     public override void Update()
     {
         base.Update();
-        if (_rb.linearVelocity.y < 0)
-        {
-            _stateMachine.ChangeState(_player.FallState);
-        }
         if (_player.IsGroundDetect)
         {
             _stateMachine.ChangeState(_player.IdleState);

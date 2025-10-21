@@ -1,8 +1,8 @@
 using UnityEngine;
 
-public class RunState : StateBase
+public class PlayerRunState : PlayerStateBase
 {
-    public RunState(PlayerController player) : base(player)
+    public PlayerRunState(PlayerController player) : base(player)
     {
     }
 
