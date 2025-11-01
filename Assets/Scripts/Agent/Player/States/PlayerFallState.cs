@@ -18,13 +18,13 @@ public class PlayerFallState : PlayerStateBase
     public override void Update()
     {
         base.Update();
-        if (_player.IsGroundDetect)
+        if (_player.IsGroundDetect || _rb.linearVelocity.y == 0)
         {
-            _stateMachine.ChangeState(_player.IdleState);
+            _stateMachine.ChangeState(_player.PlayerIdleState);
         }
         if (_player.IsWallDetected)
         {
-            _stateMachine.ChangeState(_player.WallSlideState);
+            _stateMachine.ChangeState(_player.PlayerWallSlideState);
         }
     }
 }

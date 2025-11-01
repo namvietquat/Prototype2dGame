@@ -22,22 +22,22 @@ public class PlayerIdleState : PlayerStateBase
         base.Update();
         if (_player.MoveInput.x != 0)
         {
-            _stateMachine.ChangeState(_player.RunState);
+            _stateMachine.ChangeState(_player.PlayerRunState);
         }
         if (_player.JumpInput != 0)
         {
             _rb.linearVelocity = new Vector2(_rb.linearVelocity.x, _player.JumpForce * _player.JumpInput);
             _player.JumpInput = 0f;
-            _stateMachine.ChangeState(_player.JumpState);
+            _stateMachine.ChangeState(_player.PlayerJumpState);
         }
         if (!_player.IsGroundDetect)
         {
-            _stateMachine.ChangeState(_player.FallState);
+            _stateMachine.ChangeState(_player.PlayerFallState);
         }
         if (_player.AttackInput != 0)
         {
             _player.AttackInput = 0f;
-            _stateMachine.ChangeState(_player.BasicAttackState);
+            _stateMachine.ChangeState(_player.PlayerBasicAttackState);
         }
     }
 }

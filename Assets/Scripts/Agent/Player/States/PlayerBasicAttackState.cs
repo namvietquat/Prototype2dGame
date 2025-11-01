@@ -2,29 +2,28 @@ using UnityEngine;
 
 public class PlayerBasicAttackState : PlayerStateBase
 {
-    private int _currentAttackIndex = 0;
-    private const int MAX_INDEX = 3;
+    private int _comboAttackIndex = 1;
+    private const int MAX_COMBO_INDEX = 3;
     private float _lastAttackTime;
     private float _comboChainTime = 1f;
-    public PlayerBasicAttackState(PlayerController playerController) : base(playerController)
+
+    public PlayerBasicAttackState(PlayerController player) : base(player)
     {
     }
+
     public override void Enter()
     {
         base.Enter();
         _anim.SetBool("IsAttack", true);
-        if (Time.time > _lastAttackTime + _comboChainTime)
+        _comboAttackIndex++;
+        if (Time.time > _lastAttackTime + _comboChainTime
+            || _comboAttackIndex > MAX_COMBO_INDEX)
         {
-            _currentAttackIndex = 0;
+            _comboAttackIndex = 1;
         }
-        if (_currentAttackIndex >= MAX_INDEX)
-        {
-            _currentAttackIndex = 0;
-        }
-        _currentAttackIndex++;
+        _anim.SetInteger("BasicAttackIndex", _comboAttackIndex);
+        _player.SetFacingDirection(_player.MoveInput.x);
         _lastAttackTime = Time.time;
-        _anim.SetInteger("BasicAttackIndex", _currentAttackIndex);
-        _rb.linearVelocity = new Vector2(_player.AttackPushForce.x * _player.FacingDirection, _player.AttackPushForce.y);
     }
     public override void Exit()
     {
@@ -34,9 +33,14 @@ public class PlayerBasicAttackState : PlayerStateBase
     public override void Update()
     {
         base.Update();
-        if (_triggerEvent)
+        _rb.linearVelocity = new Vector2(_player.AttackPushForce * _player.FacingDirection, _rb.linearVelocity.y);
+        if (_animationEventTrigger)
         {
-            _stateMachine.ChangeState(_player.IdleState);
+            _stateMachine.ChangeState(_player.PlayerIdleState);
+        }
+        if (!_player.IsGroundDetect && _rb.linearVelocity.y < 0)
+        {
+            _stateMachine.ChangeState(_player.PlayerFallState);
         }
     }
 }

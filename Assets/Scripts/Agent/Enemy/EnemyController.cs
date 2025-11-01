@@ -1,151 +1,90 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
-public class EnemyController : AgentController
+public class EnemyController : AgentController, IDamageable
 {
-    private StateMachine _stateMachine;
-    private Rigidbody2D _rb;
-    public Rigidbody2D RB => _rb;
-    private Animator _animator;
-
-    #region Input
-    private Vector2 _moveInput;
-    private float _jumpInput;
-    private float _attackInput;
-    #endregion
-
-    #region Detection flags
-    private bool _isGroundDetect;
-    private bool _isWallDetected;
-    #endregion
-
     #region Serialized fields
-    [SerializeField] private float _moveSpeed = 5f;
-    [SerializeField] private float _jumpForce = 2f;
-    [SerializeField] private float _detectGroundDistance = 0.7f;
-    [SerializeField] private float _detectWallDistance = 0.3f;
-    [SerializeField] private float _wallSlideResistanceCoeff = 0.5f;
-    [SerializeField] private Vector2 _wallJumpDirection = new Vector2(6f, 15f);
-    [SerializeField] private Vector2 _attackPushForce;
-    [SerializeField] private LayerMask _groundLayer;
-    [SerializeField] private LayerMask _wallLayer;
+    [SerializeField] private float _walkSpeed = 2.5f;
+    [SerializeField] private float _runSpeed = 5f;
+    [SerializeField] private float _idleTime = 2f;
+    [SerializeField] private float _attackRange;
+    [SerializeField] private LayerMask _playerLayer;
+    [SerializeField] private float _detectRange;
     #endregion
 
-    #region Public properties
-    public Animator Anim => _animator;
-    public bool IsGroundDetect => _isGroundDetect;
-    public bool IsWallDetected => _isWallDetected;
-    public Vector2 MoveInput => _moveInput;
-    public float JumpInput { get => _jumpInput; set => _jumpInput = value; }
-    public float AttackInput { get => _attackInput; set => _attackInput = value; }
-    public Vector2 AttackPushForce => _attackPushForce;
-    public StateMachine StateMachine => _stateMachine;
-    public float MoveSpeed => _moveSpeed;
-    public float JumpForce => _jumpForce;
-    public float WallSlideResistanceCoeff => _wallSlideResistanceCoeff;
-    public Vector2 WallJumpDirection => _wallJumpDirection;
-    public float FacingDirection => transform.localScale.x;
-    #endregion
+    public float WalkSpeed => _walkSpeed;
+    public float RunSpeed => _runSpeed;
+    public float IdleTime => _idleTime;
+    public float AttackRange => _attackRange;
 
     #region States    
     public EnemyStateBase EnemyIdleState;
+    public EnemyStateBase EnemyWalkState;
     public EnemyStateBase EnemyRunState;
+    public EnemyStateBase EnemyFallState;
+    public EnemyStateBase EnemyBattleState;
     public EnemyStateBase EnemyBasicAttackState;
+    public EnemyStateBase EnemyHurtState;
+    public EnemyStateBase EnemyDeathState;
     #endregion
 
-    void Awake()
+    protected override void Awake()
     {
-        _rb = GetComponent<Rigidbody2D>();
-        _animator = GetComponent<Animator>();
-        _stateMachine = new StateMachine();
-
+        base.Awake();
         EnemyIdleState = new EnemyIdleState(this);
+        EnemyWalkState = new EnemyWalkState(this);
         EnemyRunState = new EnemyRunState(this);
-     
+        EnemyFallState = new EnemyFallState(this);
+        EnemyBattleState = new EnemyBattleState(this);
         EnemyBasicAttackState = new EnemyBasicAttackState(this);
+        EnemyHurtState = new EnemyHurtState(this);
+        EnemyDeathState = new EnemyDeathState(this);
         _stateMachine.ChangeState(EnemyIdleState);
     }
-    void Update()
+
+    public void Walk()
     {
-        _stateMachine.CurrentState.Update();
-        DetectGround();
-        DetectWall();
+        _rb.linearVelocity = new Vector2(_walkSpeed * FacingDirection, _rb.linearVelocity.y);
+    }
+    public void Run()
+    {
+        _rb.linearVelocity = new Vector2(_runSpeed * FacingDirection, _rb.linearVelocity.y);
+    }
+    public void BasicAttack()
+    {
+        
     }
 
-
-    public void Move(InputAction.CallbackContext ctx)
+    public RaycastHit2D PlayerDetected()
     {
-        _moveInput = ctx.ReadValue<Vector2>();
-    }
-    public void Jump(InputAction.CallbackContext ctx)
-    {
-        if (ctx.started)
+        RaycastHit2D hit = Physics2D.Raycast(_detectGameobject.position, Vector2.right * FacingDirection, _detectRange, _playerLayer);
+        if (hit.collider != null)
         {
-            _jumpInput = ctx.ReadValue<float>();
+            Debug.Log("Player detected");
+            return hit;
         }
-    }
-    public void BasicAttack(InputAction.CallbackContext ctx)
-    {
-        _attackInput = ctx.ReadValue<float>();
+        return default;
     }
 
-    public void SetFacingDirection(float direction)
+    public void OnDamage(float damage)
     {
-        if (direction == 0)
+        _health -= damage;
+        _healthBar.SetValue(_health);
+        _stateMachine.ChangeState(EnemyHurtState);
+        if (_health <= 0)
         {
-            return;
-        }
-        if (direction > 0 != transform.localScale.x > 0)
-        {
-            transform.localScale *= new Vector2(-1f, 1f);
-        }
-    }
-
-    private void DetectGround()
-    {
-        List<RaycastHit2D> hit = new();
-        var filter = new ContactFilter2D
-        {
-            layerMask = _groundLayer,
-            useLayerMask = true
-        };
-        if (Physics2D.Raycast(transform.position, Vector2.down, filter, hit, _detectGroundDistance) > 0)
-        {
-            _isGroundDetect = true;
-        }
-        else
-        {
-            _isGroundDetect = false;
+            Die();
         }
     }
 
-    private void DetectWall()
+    public void Die()
     {
-        List<RaycastHit2D> hit = new();
-        var filter = new ContactFilter2D
-        {
-            layerMask = _wallLayer,
-            useLayerMask = true
-        };
-        if (Physics2D.Raycast(transform.position, Vector2.right * FacingDirection, filter, hit, _detectWallDistance) > 0)
-        {
-            _isWallDetected = true;
-        }
-        else
-        {
-            _isWallDetected = false;
-        }
+        _stateMachine.ChangeState(EnemyDeathState);
     }
 
-    public void CallAnimationEvent()
+    protected override void OnDrawGizmos()
     {
-        _stateMachine.CurrentState.TriggerEvent = true;
-    }
-
-    void OnDrawGizmos()
-    {
-        Gizmos.color = Color.yellow;
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.down * _detectGroundDistance);
-        Gizmos.DrawLine(transform.position, transform.position + Vector3.right * _detectWallDistance * FacingDirection);
+        base.OnDrawGizmos();
+        Gizmos.color = Color.green;
+        Gizmos.DrawLine(_detectGameobject.position, _detectGameobject.position + Vector3.right * FacingDirection * _detectRange);
     }
 }

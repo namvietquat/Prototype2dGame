@@ -1,34 +1,19 @@
 using UnityEngine;
 
-public class EnemyIdleState : EnemyStateBase
+public class EnemyIdleState : EnemyGroundState
 {
-    public EnemyIdleState(EnemyController enemy) : base(enemy)
+    public EnemyIdleState(EnemyController player) : base(player)
     {
-    }
-
-    public override void Enter()
-    {
-        base.Enter();
-        _anim.SetBool("IsGround", true);
-    }
-    public override void Exit()
-    {
-        base.Exit();
-        _anim.SetBool("IsGround", false);
     }
 
     public override void Update()
     {
         base.Update();
-        if (_enemy.MoveInput.x != 0)
+        timer -= Time.deltaTime;
+        if (timer <= 0)
         {
-            _stateMachine.ChangeState(_enemy.EnemyRunState);
-        }
-        
-        if (_enemy.AttackInput != 0)
-        {
-            _enemy.AttackInput = 0f;
-            _stateMachine.ChangeState(_enemy.EnemyBasicAttackState);
+            _controller.SetFacingDirection(_controller.FacingDirection * -1);
+            _stateMachine.ChangeState(_controller.EnemyWalkState);
         }
     }
 }

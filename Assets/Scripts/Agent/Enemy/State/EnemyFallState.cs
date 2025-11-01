@@ -18,13 +18,5 @@ public class EnemyFallState : EnemyStateBase
     public override void Update()
     {
         base.Update();
-        if (_enemy.IsGroundDetect)
-        {
-            _stateMachine.ChangeState(_enemy.IdleState);
-        }
-        if (_enemy.IsWallDetected)
-        {
-            _stateMachine.ChangeState(_enemy.WallSlideState);
-        }
     }
 }

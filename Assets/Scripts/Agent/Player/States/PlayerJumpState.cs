@@ -20,15 +20,15 @@ public class PlayerJumpState : PlayerStateBase
         base.Update();
         if (_rb.linearVelocity.y < 0)
         {
-            _stateMachine.ChangeState(_player.FallState);
+            _stateMachine.ChangeState(_player.PlayerFallState);
         }
         if (_player.IsGroundDetect)
         {
-            _stateMachine.ChangeState(_player.IdleState);
+            _stateMachine.ChangeState(_player.PlayerIdleState);
         }
         if (_player.IsWallDetected)
         {
-            _stateMachine.ChangeState(_player.WallSlideState);
+            _stateMachine.ChangeState(_player.PlayerWallSlideState);
         }
     }
 }

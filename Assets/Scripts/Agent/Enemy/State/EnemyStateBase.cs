@@ -4,15 +4,15 @@ using UnityEngine;
 [Serializable]
 public class EnemyStateBase : AgentStateBase
 {
-    protected EnemyController _enemy;
+    protected EnemyController _controller;
     public EnemyStateBase(EnemyController enemyController) : base(enemyController)
     {
-        
-        _enemy = enemyController;
+        _controller = enemyController;
     }
-    private void HandleAnimation()
+
+    protected override void HandleAnimation()
     {
-      _anim.SetFloat("xInput", _rb.linearVelocity.x);
-      _anim.SetFloat("yInput", _rb.linearVelocity.y);
+        _anim.SetFloat("xInput", _rb.linearVelocity.x / _controller.RunSpeed);
+        _anim.SetFloat("yInput", _rb.linearVelocity.y);
     }
 }

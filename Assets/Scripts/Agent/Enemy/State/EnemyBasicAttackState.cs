@@ -2,29 +2,20 @@ using UnityEngine;
 
 public class EnemyBasicAttackState : EnemyStateBase
 {
-    private int _currentAttackIndex = 0;
-    private const int MAX_INDEX = 3;
-    private float _lastAttackTime;
-    private float _comboChainTime = 1f;
+    private int _comboAttackIndex = 1;
+    private const int MAX_COMBO_INDEX = 3;
+
     public EnemyBasicAttackState(EnemyController enemy) : base(enemy)
     {
     }
+
     public override void Enter()
     {
         base.Enter();
         _anim.SetBool("IsAttack", true);
-        if (Time.time > _lastAttackTime + _comboChainTime)
-        {
-            _currentAttackIndex = 0;
-        }
-        if (_currentAttackIndex >= MAX_INDEX)
-        {
-            _currentAttackIndex = 0;
-        }
-        _currentAttackIndex++;
-        _lastAttackTime = Time.time;
-        _anim.SetInteger("BasicAttackIndex", _currentAttackIndex);
-        _rb.linearVelocity = new Vector2(_enemy.AttackPushForce.x * _enemy.FacingDirection, _enemy.AttackPushForce.y);
+        _comboAttackIndex = Random.Range(1, MAX_COMBO_INDEX + 1);
+        _anim.SetInteger("BasicAttackIndex", _comboAttackIndex);
+        _rb.linearVelocity = new Vector2(0f, _rb.linearVelocity.y);
     }
     public override void Exit()
     {
@@ -34,9 +25,9 @@ public class EnemyBasicAttackState : EnemyStateBase
     public override void Update()
     {
         base.Update();
-        if (_triggerEvent)
+        if (_animationEventTrigger)
         {
-            _stateMachine.ChangeState(_enemy.IdleState);
+            _stateMachine.ChangeState(_controller.EnemyBattleState);
         }
     }
 }

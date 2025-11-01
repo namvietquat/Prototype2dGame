@@ -34,16 +34,16 @@ public class PlayerWallSlideState : PlayerStateBase
             _rb.linearVelocity = new Vector2(_player.WallJumpDirection.x * _player.FacingDirection * -1f, _player.WallJumpDirection.y);
             _player.SetFacingDirection(_player.FacingDirection*-1f);
             _player.JumpInput = 0f;
-            _stateMachine.ChangeState(_player.JumpState);
+            _stateMachine.ChangeState(_player.PlayerJumpState);
         }
         if (_player.IsGroundDetect)
         {
             _player.SetFacingDirection(_player.FacingDirection * -1f);
-            _stateMachine.ChangeState(_player.IdleState);
+            _stateMachine.ChangeState(_player.PlayerIdleState);
         }
         if (_player.IsWallDetected == false)
         {
-            _stateMachine.ChangeState(_player.FallState);
+            _stateMachine.ChangeState(_player.PlayerFallState);
         }
 
     }

@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AnimationEvent : MonoBehaviour
+public class AnimationEvents : MonoBehaviour
 {
     private PlayerController _player;
     void Awake()
@@ -9,7 +9,6 @@ public class AnimationEvent : MonoBehaviour
     }
     public void AttackFinish()
     {
-        // Notify player
-        _player.CallAnimationEvent();
+        _player.TriggerAnimationEvent();
     }
 }
